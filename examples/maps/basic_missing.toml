@@ -1,0 +1,9 @@
+format_version = 1
+name = "Incomplete World"
+
+areas = [
+    { id = "farm", type = "farm", width = 2, height = 1, tiles = [["grass", "path"]] },
+]
+
+elements = []
+transitions = []
