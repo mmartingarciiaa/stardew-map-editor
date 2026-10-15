@@ -1,4 +1,4 @@
-#include "map/persistence/MapFile.h"
+#include "map/persistence/TomlMapFile.h"
 
 #include <cstdint>
 #include <fstream>
@@ -154,7 +154,7 @@ toml::table serializeTransition(const MapTransition& transition) {
 
 }  // namespace
 
-MapDefinition loadMapDefinition(const std::string& path) {
+MapDefinition loadTomlMapDefinition(const std::string& path) {
     // Parsea el documento y convierte errores de sintaxis en diagnosticos con la ruta del mapa.
     toml::table document;
     try {
@@ -194,7 +194,7 @@ MapDefinition loadMapDefinition(const std::string& path) {
     return map;
 }
 
-void saveMapDefinition(const std::string& path, const MapDefinition& map) {
+void saveTomlMapDefinition(const std::string& path, const MapDefinition& map) {
     // Construye el TOML a partir del modelo; los enums se escriben con sus IDs estables.
     toml::table document;
     insertOptionalInt(document, "format_version", map.formatVersion);

@@ -28,7 +28,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    LoadCaller["Caller"] --> LoadMap["loadMapDefinition(path)"]
+    LoadCaller["Caller"] --> LoadMap["loadTomlMapDefinition(path)"]
     LoadMap --> ParseMap["toml::parse_file"]
     ParseMap --> Metadata["Lee version y nombre"]
     Metadata --> ReadAreas["Por cada [[areas]]: readArea"]
@@ -37,7 +37,7 @@ flowchart TD
     ReadElements --> ReadTransitions["Por cada [[transitions]]: readTransition"]
     ReadTransitions --> Definition["Devuelve MapDefinition"]
 
-    SaveCaller["Caller"] --> SaveMap["saveMapDefinition(path, map)"]
+    SaveCaller["Caller"] --> SaveMap["saveTomlMapDefinition(path, map)"]
     SaveMap --> Header["Crea tabla raiz y escribe metadatos"]
     Header --> SaveAreas["Por cada area: serializeArea"]
     SaveAreas --> SaveElements["Por cada elemento: serializeElement"]
@@ -47,9 +47,9 @@ flowchart TD
 
 ### Que hace cada bloque
 
-`loadMapDefinition(path)` parsea el archivo con `toml::parse_file`. Luego lee los metadatos y recorre cada array TOML. `readArea`, `readElement` y `readTransition` convierten una entrada individual al modelo C++; `readTiles` convierte cada nombre de terreno a `TileType`. Por eso el parser rechaza nombres desconocidos de area, tile, elemento o capa. Algunos campos semanticos pueden quedar ausentes (`optional`) para que `validateMap()` explique el problema; los datos necesarios para interpretar la forma de una entrada, como una fila TOML que no sea array, se rechazan durante la lectura.
+`loadTomlMapDefinition(path)` parsea el archivo con `toml::parse_file`. Luego lee los metadatos y recorre cada array TOML. `readArea`, `readElement` y `readTransition` convierten una entrada individual al modelo C++; `readTiles` convierte cada nombre de terreno a `TileType`. Por eso el parser rechaza nombres desconocidos de area, tile, elemento o capa. Algunos campos semanticos pueden quedar ausentes (`optional`) para que `validateMap()` explique el problema; los datos necesarios para interpretar la forma de una entrada, como una fila TOML que no sea array, se rechazan durante la lectura.
 
-`saveMapDefinition(path, map)` hace el camino inverso: crea una tabla TOML raiz, escribe metadatos y agrega arrays para areas, elementos y transiciones. `serializeArea`, `serializeElement` y `serializeTransition` convierten cada objeto al conjunto de claves propio de su tipo. Al final `toml++` imprime el documento y el stream comprueba que la escritura haya funcionado.
+`saveTomlMapDefinition(path, map)` hace el camino inverso: crea una tabla TOML raiz, escribe metadatos y agrega arrays para areas, elementos y transiciones. `serializeArea`, `serializeElement` y `serializeTransition` convierten cada objeto al conjunto de claves propio de su tipo. Al final `toml++` imprime el documento y el stream comprueba que la escritura haya funcionado.
 
 Hay un loop por cada coleccion porque solo cambia la funcion especializada que serializa cada objeto. No se unificaron en un serializador generico: area, elemento y transicion tienen campos diferentes, y una abstraccion con callbacks ocultaria ese mapeo en lugar de simplificarlo.
 
@@ -58,7 +58,7 @@ Hay un loop por cada coleccion porque solo cambia la funcion especializada que s
 - `MapArea`, `MapElement`, `MapTransition` y `MapDefinition` usan `operator== = default` para comparar sus miembros automaticamente. El test de round-trip usa esa igualdad para comprobar que guardar y volver a cargar conserva todos los datos.
 - `optionalFloor()` lee `from_floor` o `to_floor` de una regla. Si el campo no esta, la regla aplica a cualquier piso de ese tipo; si esta, debe ser un entero positivo.
 - `optionalArray()` distingue una coleccion ausente de una clave presente con tipo incorrecto. La primera devuelve `nullptr` y se interpreta como vacia; la segunda lanza un error. El puntero apunta a memoria propiedad de la tabla TOML.
-- `namespace stardew::maps` se abre en varios archivos para poner sus declaraciones y definiciones en el mismo namespace. `TomlTableReader` vive en `stardew::maps::detail` porque lo reutilizan ambos loaders. Los helpers como `readArea()` y `serializeTransition()` permanecen privados en `MapFile.cpp`: conocen el esquema del mapa, no son utilidades TOML genericas.
+- `namespace stardew::maps` se abre en varios archivos para poner sus declaraciones y definiciones en el mismo namespace. `TomlTableReader` vive en `stardew::maps::detail` porque lo reutilizan ambos loaders. Los helpers como `readArea()` y `serializeTransition()` permanecen privados en `TomlMapFile.cpp`: conocen el esquema del mapa, no son utilidades TOML genericas.
 
 ## Validacion del mapa
 
@@ -69,7 +69,7 @@ flowchart TD
     Caller["UI futura o tests"] --> Service["MapService"]
     Service --> Repository["MapRepository (inyectado)"]
     Repository --> TomlRepository["TomlMapRepository"]
-    TomlRepository --> LoadFile["MapFile: loadMapDefinition(path)"]
+    TomlRepository --> LoadFile["TomlMapFile: loadTomlMapDefinition(path)"]
     LoadFile --> Map["MapDefinition en memoria"]
     Service --> Requirements["MapRequirements inyectados"]
     Map --> Validate["validateMap(map, requirements)"]

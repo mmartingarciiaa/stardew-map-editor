@@ -9,7 +9,6 @@
 MainMenuWidget::MainMenuWidget(
     std::function<void()> onCreateMap,
     std::function<void()> onLoadMap,
-    std::function<void()> onExit,
     QWidget* parent)
     : QWidget(parent) {
     setObjectName("mainMenu");
@@ -33,7 +32,6 @@ MainMenuWidget::MainMenuWidget(
 
     auto* createButton = new MenuButton("Crear nuevo mapa", content);
     auto* loadButton = new MenuButton("Cargar mapa existente", content);
-    auto* exitButton = new MenuButton("Salir", content);
 
     contentLayout->addWidget(eyebrow);
     contentLayout->addWidget(title);
@@ -41,7 +39,6 @@ MainMenuWidget::MainMenuWidget(
     contentLayout->addSpacing(14);
     contentLayout->addWidget(createButton);
     contentLayout->addWidget(loadButton);
-    contentLayout->addWidget(exitButton);
 
     auto* centerLayout = new QHBoxLayout;
     centerLayout->addStretch();
@@ -54,22 +51,14 @@ MainMenuWidget::MainMenuWidget(
     pageLayout->addLayout(centerLayout);
     pageLayout->addStretch();
 
-    // Conecta el boton de crear con la accion provista por la ventana principal.
     connect(createButton, &QPushButton::clicked, this, [onCreateMap]() {
         if (onCreateMap) {
             onCreateMap();
         }
     });
-    // Conecta el boton de carga con la accion que busca un mapa existente.
     connect(loadButton, &QPushButton::clicked, this, [onLoadMap]() {
         if (onLoadMap) {
             onLoadMap();
-        }
-    });
-    // Ejecuta la accion de cierre provista por la ventana principal.
-    connect(exitButton, &QPushButton::clicked, this, [onExit]() {
-        if (onExit) {
-            onExit();
         }
     });
 }

@@ -9,6 +9,5 @@ public:
     explicit MainMenuWidget(
         std::function<void()> onCreateMap,
         std::function<void()> onLoadMap,
-        std::function<void()> onExit,
         QWidget* parent = nullptr);
 };

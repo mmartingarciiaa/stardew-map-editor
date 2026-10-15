@@ -1,8 +1,4 @@
 #include <QApplication>
-#include <QCoreApplication>
-#include <QDir>
-#include <QFileDialog>
-#include <QFileInfo>
 #include <QMessageBox>
 #include <QMainWindow>
 
@@ -25,30 +21,10 @@ int main(int argc, char* argv[]) {
                 "La creacion de mapas todavia no esta implementada.");
         },
         [&window]() {
-            QString mapsDirectory = QDir(QCoreApplication::applicationDirPath())
-                                        .absoluteFilePath("../maps");
-            if (!QDir(mapsDirectory).exists()) {
-                mapsDirectory = QDir(QCoreApplication::applicationDirPath())
-                                    .absoluteFilePath("..");
-            }
-
-            const QString mapPath = QFileDialog::getOpenFileName(
-                &window,
-                "Seleccionar mapa",
-                mapsDirectory,
-                "Mapas TOML (*.toml)");
-            if (mapPath.isEmpty()) {
-                return;
-            }
-
             QMessageBox::information(
                 &window,
-                "Mapa seleccionado",
-                QString("Se selecciono el archivo:\n%1")
-                    .arg(QFileInfo(mapPath).absoluteFilePath()));
-        },
-        [&window]() {
-            window.close();
+                "Cargar mapa",
+                "La carga de mapas todavia no esta implementada.");
         });
     window.setCentralWidget(mainMenu);
     window.show();

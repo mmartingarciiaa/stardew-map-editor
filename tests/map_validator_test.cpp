@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "map/persistence/MapFile.h"
+#include "map/persistence/TomlMapFile.h"
 #include "map/persistence/MapRepository.h"
 #include "map/persistence/MapRequirementsLoader.h"
 #include "map/service/MapService.h"
@@ -442,12 +442,12 @@ std::filesystem::path temporaryMapPath() {
            ("stardew-map-test-" + std::to_string(timestamp) + ".toml");
 }
 
-bool testMapFileRoundTrip(const MapRequirements& requirements) {
+bool testTomlMapFileRoundTrip(const MapRequirements& requirements) {
     const auto path = temporaryMapPath();
     const auto expected = makeValidMap();
     try {
-        stardew::maps::saveMapDefinition(path.string(), expected);
-        const auto actual = stardew::maps::loadMapDefinition(path.string());
+        stardew::maps::saveTomlMapDefinition(path.string(), expected);
+        const auto actual = stardew::maps::loadTomlMapDefinition(path.string());
         std::filesystem::remove(path);
         if (actual != expected) {
             std::cerr << "map TOML round-trip changed map data\n";
@@ -478,7 +478,7 @@ bool testUnknownTileRejected() {
               "tiles = [[\"gras\"]]\n";
     }
     try {
-        static_cast<void>(stardew::maps::loadMapDefinition(path.string()));
+        static_cast<void>(stardew::maps::loadTomlMapDefinition(path.string()));
     } catch (const std::runtime_error&) {
         std::filesystem::remove(path);
         return true;
@@ -510,7 +510,7 @@ bool testUnknownElementTypeRejected() {
                   "height = 1\n";
     }
     try {
-        static_cast<void>(stardew::maps::loadMapDefinition(path.string()));
+        static_cast<void>(stardew::maps::loadTomlMapDefinition(path.string()));
     } catch (const std::runtime_error&) {
         std::filesystem::remove(path);
         return true;
@@ -532,7 +532,7 @@ bool testMissingTypedFieldsRemainDetectable() {
               "tiles = [[\"grass\"]]\n";
     }
     try {
-        const auto map = stardew::maps::loadMapDefinition(path.string());
+        const auto map = stardew::maps::loadTomlMapDefinition(path.string());
         std::filesystem::remove(path);
         return !map.formatVersion.has_value() && !map.areas.front().type.has_value();
     } catch (const std::exception& error) {
@@ -677,7 +677,7 @@ int main(int argc, char* argv[]) {
         passed = testMissingRequiredFields(requirements) && passed;
         passed = testMissingElementTypeAndLayer(requirements) && passed;
         passed = testElementTypeNames() && passed;
-        passed = testMapFileRoundTrip(requirements) && passed;
+        passed = testTomlMapFileRoundTrip(requirements) && passed;
         passed = testUnknownTileRejected() && passed;
         passed = testUnknownElementTypeRejected() && passed;
         passed = testMissingTypedFieldsRemainDetectable() && passed;
