@@ -80,6 +80,29 @@ inline std::string_view toString(TileType type) {
     return "unknown_tile";
 }
 
+inline std::vector<TileType> allTileTypes() {
+    return {
+        TileType::Grass,
+        TileType::Dirt,
+        TileType::TilledSoil,
+        TileType::Water,
+        TileType::Path,
+        TileType::Stone,
+        TileType::CaveFloor,
+        TileType::CaveWall,
+        TileType::WoodFloor,
+        TileType::Sand,
+    };
+}
+
+inline std::vector<AreaType> allAreaTypes() {
+    return {
+        AreaType::Farm,
+        AreaType::Village,
+        AreaType::DungeonFloor,
+    };
+}
+
 inline std::optional<AreaType> areaTypeFromString(std::string_view value) {
     if (value == "farm") return AreaType::Farm;
     if (value == "village") return AreaType::Village;
@@ -136,6 +159,26 @@ inline std::string_view toString(ElementType type) {
     return "unknown_element";
 }
 
+inline std::vector<ElementType> allElementTypes() {
+    return {
+        ElementType::Cabin,
+        ElementType::Market,
+        ElementType::CommunityCenter,
+        ElementType::DungeonEntrance,
+        ElementType::MerchantMarnie,
+        ElementType::MerchantClint,
+        ElementType::MerchantPierre,
+        ElementType::MerchantRobin,
+        ElementType::Rock,
+        ElementType::OreNode,
+        ElementType::Chest,
+        ElementType::Decoration,
+        ElementType::Door,
+        ElementType::Stairs,
+        ElementType::SpawnPoint,
+    };
+}
+
 inline std::optional<ElementLayer> elementLayerFromString(std::string_view value) {
     if (value == "structure") return ElementLayer::Structure;
     if (value == "object") return ElementLayer::Object;
@@ -150,6 +193,30 @@ inline std::string_view toString(ElementLayer layer) {
         case ElementLayer::Npc: return "npc";
     }
     return "unknown_layer";
+}
+
+inline ElementLayer elementLayerFor(ElementType type) {
+    switch (type) {
+        case ElementType::Cabin:
+        case ElementType::Market:
+        case ElementType::CommunityCenter:
+        case ElementType::DungeonEntrance:
+            return ElementLayer::Structure;
+        case ElementType::MerchantMarnie:
+        case ElementType::MerchantClint:
+        case ElementType::MerchantPierre:
+        case ElementType::MerchantRobin:
+            return ElementLayer::Npc;
+        case ElementType::Rock:
+        case ElementType::OreNode:
+        case ElementType::Chest:
+        case ElementType::Decoration:
+        case ElementType::Door:
+        case ElementType::Stairs:
+        case ElementType::SpawnPoint:
+            return ElementLayer::Object;
+    }
+    return ElementLayer::Object;
 }
 
 struct MapArea {
